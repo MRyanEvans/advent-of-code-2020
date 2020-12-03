@@ -8,16 +8,12 @@ int main() {
 
     filePointer = fopen("input.txt", "r");
 
-    int *numbers = calloc(1, sizeof(int));
+    int *numbers = calloc(2020, sizeof(int));
     int max = 0;
 
     while (fgets(buffer, bufferLength, filePointer)) {
         long n = atoi(buffer);
         if (n > max) {
-            numbers = realloc(numbers, 2020 * sizeof(int));
-            for (int i = max + 1; i < n; i++) {
-                numbers[i] = 0;
-            }
             max = n;
         }
         numbers[n] = 1;
