@@ -71,25 +71,18 @@ void read_file_into_map(const char *filename, int *map, struct Dimensions dimens
     free(file_pointer);
 }
 
-int main() {
-    const char *filename = "input.txt";
-    struct Dimensions dimensions = get_map_dimensions(filename);
-    int width = dimensions.width;
-    int height = dimensions.height;
-
-    int *map = calloc(width * height, sizeof(int));
-
+unsigned long long count_trees_for_pattern(int *map, struct Dimensions dimensions, char *pattern, int size) {
     char tree = '#';
-
-    read_file_into_map(filename, map, dimensions);
 
     int pos_row = 0;
     int pos_offset = 0;
 
+    int width = dimensions.width;
+    int height = dimensions.height;
+
     int tree_count = 0;
     while (pos_row < height - 1) {
-        char pattern[] = {'r', 'r', 'r', 'd'};
-        for (int i = 0; i < sizeof(pattern) / sizeof(pattern[0]); i++) {
+        for (int i = 0; i < size; i++) {
             if (pattern[i] == 'r') {
                 pos_offset++;
                 if (pos_offset == width) {
@@ -105,9 +98,34 @@ int main() {
             tree_count++;
         }
     }
+    return tree_count;
+}
+
+int main() {
+    const char *filename = "input.txt";
+    struct Dimensions dimensions = get_map_dimensions(filename);
+
+    int *map = calloc(dimensions.width * dimensions.height, sizeof(int));
+
+    read_file_into_map(filename, map, dimensions);
+
+    char pattern_1_1[] = {'r', 'd'};
+    char pattern_3_1[] = {'r', 'r', 'r', 'd'};
+    char pattern_5_1[] = {'r', 'r', 'r', 'r', 'r', 'd'};
+    char pattern_7_1[] = {'r', 'r', 'r', 'r', 'r', 'r', 'r', 'd'};
+    char pattern_1_2[] = {'r', 'd', 'd'};
+
+    int part_1_count = count_trees_for_pattern(map, dimensions, pattern_3_1, 4);
+    unsigned long long part_2_count = count_trees_for_pattern(map, dimensions, pattern_1_1, 2)
+                                      * count_trees_for_pattern(map, dimensions, pattern_3_1, 4)
+                                      * count_trees_for_pattern(map, dimensions, pattern_5_1, 6)
+                                      * count_trees_for_pattern(map, dimensions, pattern_7_1, 8)
+                                      * count_trees_for_pattern(map, dimensions, pattern_1_2, 3);
+
     free(map);
 
-    printf("Part 1 Tree Count:  %d\n", tree_count);
+    printf("Part 1 Tree Count:  %d\n", part_1_count);
+    printf("Part 2 Tree Count:  %lld\n", part_2_count);
     return 1;
 }
 
