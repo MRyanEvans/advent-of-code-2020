@@ -10,23 +10,13 @@ open INFILE, 'input.txt';
 my $line;
 while ($line = <INFILE>) {
     chomp($line);
-    my $row = 0;
-    my $column = 0;
+    my $seat = 0;
     foreach my $char (split //, $line) {
-        if ($char eq 'B' || $char eq 'F') {
-            $row = $row << 1;
-            if ($char eq 'B') {
-                $row = $row + 1;
-            }
-        }
-        elsif ($char eq 'L' || $char eq 'R') {
-            $column = $column << 1;
-            if ($char eq 'R') {
-                $column = $column + 1;
-            }
+        $seat = $seat << 1;
+        if ($char eq 'B' || $char eq 'R') {
+            $seat = $seat + 1;
         }
     }
-    my $seat = ($row * 8) + $column;
     if ($seat > $max) {
         $max = $seat;
     }
