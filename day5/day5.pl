@@ -12,22 +12,21 @@ while ($line = <INFILE>) {
     chomp($line);
     my $row = 0;
     my $column = 0;
-    my $seat;
-    my $row_def = substr($line, 0, 7);
-    my $col_def = substr($line, 7, 9);
-    foreach my $char (split //, $row_def) {
-        $row = $row << 1;
-        if ($char eq 'B') {
-            $row = $row + 1;
+    foreach my $char (split //, $line) {
+        if ($char eq 'B' || $char eq 'F') {
+            $row = $row << 1;
+            if ($char eq 'B') {
+                $row = $row + 1;
+            }
+        }
+        elsif ($char eq 'L' || $char eq 'R') {
+            $column = $column << 1;
+            if ($char eq 'R') {
+                $column = $column + 1;
+            }
         }
     }
-    foreach my $char (split //, $col_def) {
-        $column = $column << 1;
-        if ($char eq 'R') {
-            $column = $column + 1;
-        }
-    }
-    $seat = ($row * 8) + $column;
+    my $seat = ($row * 8) + $column;
     if ($seat > $max) {
         $max = $seat;
     }
