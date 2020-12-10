@@ -5,5 +5,8 @@
 
 *.iml
 **/input.txt
+**/input_*.txt
+**/.cpcache
+**/cmake-build-debug
 **/*.o
 
