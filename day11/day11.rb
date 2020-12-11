@@ -1,21 +1,14 @@
 #!/usr/bin/env ruby
 
-map = Array.new
-f = File.open("input.txt", "r")
-$width = 0
-f.each_line do |line|
-  map += line.strip.chars
-  $width = line.strip.chars.length
-end
-
-width = $width # todo sort out
-
-def print_map (map, width)
-  for i in (0..map.length - 1).step(width)
-    line = map[i, width] * ""
-    print "#{line}\n"
+def get_initial_map()
+  map = Array.new
+  f = File.open("input.txt", "r")
+  $width = 0
+  f.each_line do |line|
+    map += line.strip.chars
+    $width = line.strip.chars.length
   end
-  print "\n"
+  map
 end
 
 def num_occupied (map)
@@ -24,27 +17,6 @@ end
 
 empty = 'L'
 occupied = '#'
-floor = '.'
-
-changed = false
-
-def get_adjacent(n, map)
-  if n < 0
-    return nil
-  end
-  map[n]
-end
-
-def get_absolute(n, map)
-  if n == nil || n  < 0
-    return nil
-  end
-  map[n]
-end
-
-def get_seat_in_direction(i, dir, map)
-  return get_absolute(get_seat_index_in_direction(i, dir, map), map)
-end
 
 def get_seat_index_in_direction(i, dir, map)
   if dir == :up
@@ -98,21 +70,25 @@ def get_seat_index_in_direction(i, dir, map)
   nil
 end
 
+map = get_initial_map
+
 loop do
   changed = false
   overlay = []
   for i in 0..map.length - 1
-    adjacent = [get_seat_in_direction(i, :diag_up_left, map), get_seat_in_direction(i, :up, map), get_seat_in_direction(i, :diag_up_right, map),
-                get_seat_in_direction(i, :left, map), get_seat_in_direction(i, :right, map),
-                get_seat_in_direction(i, :diag_down_left, map), get_seat_in_direction(i, :down, map), get_seat_in_direction(i, :diag_down_right, map)
-    ]
-    this = map[i]
     num_occupied_adjacent = 0
-    for s in adjacent
-      if s == occupied
+    directions = [:diag_up_left, :up, :diag_up_right, :left, :right, :diag_down_left, :down, :diag_down_right]
+    for d in directions
+      si = get_seat_index_in_direction(i, d, map)
+      if si == nil || si < 0
+        next
+      end
+      if map[si] == occupied
         num_occupied_adjacent += 1
       end
     end
+
+    this = map[i]
 
     if this == empty && num_occupied_adjacent == 0
       overlay[i] = occupied
@@ -126,19 +102,13 @@ loop do
 
   end
 
-  # print_map(overlay, width)
   map = overlay
   break if changed == false
 end
 
 print "Part 1:  #{num_occupied(map)}\n"
 
-map = Array.new
-f = File.open("input.txt", "r")
-f.each_line do |line|
-  map += line.strip.chars
-  $width = line.strip.chars.length
-end
+map = get_initial_map
 
 loop do
   changed = false
@@ -160,7 +130,6 @@ loop do
         end
         n = adjacent_index
       end
-
     end
 
     if this == empty && num_occupied_adjacent == 0
@@ -174,7 +143,6 @@ loop do
     end
   end
 
-  # print_map(overlay, width)
   map = overlay
   break if changed == false
 end
