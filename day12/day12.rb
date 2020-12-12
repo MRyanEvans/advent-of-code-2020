@@ -8,21 +8,34 @@ f.each_line do |line|
   data.push([split[1], split[2].to_i])
 end
 
+def move_by_angle(point, angle, distance)
+  case angle % 360
+  when 0
+    return [point[0] + distance, point[1]]
+  when 90
+    return [point[0], point[1] + distance]
+  when 180
+    return [point[0] - distance, point[1]]
+  when 270
+    return [point[0], point[1] - distance]
+  end
+end
+
 def part1(data)
-  vectors = []
+  ship = [0, 0]
   ang = 90
   for instr in data
     case instr.first
     when 'F'
-      vectors.push([ang, instr.last])
+      ship = move_by_angle(ship, ang, instr.last)
     when 'N'
-      vectors.push([0, instr.last])
+      ship = move_by_angle(ship, 0, instr.last)
     when 'S'
-      vectors.push([180, instr.last])
+      ship = move_by_angle(ship, 180, instr.last)
     when 'E'
-      vectors.push([90, instr.last])
+      ship = move_by_angle(ship, 90, instr.last)
     when 'W'
-      vectors.push([270, instr.last])
+      ship = move_by_angle(ship, 270, instr.last)
     when 'R'
       ang = (ang + instr.last) % 360
     when 'L'
@@ -30,29 +43,23 @@ def part1(data)
     end
   end
 
-  north = 0
-  south = 0
-  east = 0
-  west = 0
-  for v in vectors
-    case v.first
-    when 0
-      north += v.last
-    when 90
-      east += v.last
-    when 180
-      south += v.last
-    when 270
-      west += v.last
-    end
+  ship[0].abs + ship[1].abs
+end
+
+def turn_point (point, angle)
+  case angle % 360
+  when 90
+    [-point[1], point[0]]
+  when 180
+    [-point[0], -point[1]]
+  when 270
+    [point[1], -point[0]]
   end
-  return (north - south).abs + (east - west).abs
 end
 
 def part2(data)
   ship = [0, 0]
   waypoint = [1, 10]
-  ang = 90
   for instr in data
     case instr.first
     when 'F'
@@ -67,27 +74,13 @@ def part2(data)
     when 'W'
       waypoint[1] -= instr.last
     when 'R'
-      case instr.last % 360
-      when 90
-        waypoint = [-waypoint[1], waypoint[0]]
-      when 180
-        waypoint = [-waypoint[0], -waypoint[1]]
-      when 270
-        waypoint = [waypoint[1], -waypoint[0]]
-      end
+      waypoint = turn_point(waypoint, instr.last)
     when 'L'
-      case instr.last % 360
-      when 90
-        waypoint = [waypoint[1], -waypoint[0]]
-      when 180
-        waypoint = [-waypoint[0], -waypoint[1]]
-      when 270
-        waypoint = [-waypoint[1], waypoint[0]]
-      end
+      waypoint = turn_point(waypoint, 360 - instr.last)
     end
   end
 
-  return ship[0].abs + ship[1].abs
+  ship[0].abs + ship[1].abs
 end
 
 print "Part 1:  #{part1(data)}\n"
