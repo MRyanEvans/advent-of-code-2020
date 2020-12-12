@@ -1,11 +1,9 @@
 #!/usr/bin/env ruby
 
-data = Array.new
-f = File.open("input.txt", "r")
-$width = 0
-f.each_line do |line|
+instructions = Array.new
+File.open("input.txt", "r").each_line do |line|
   split = line.strip.split(/([A-Z])([0-9]+)/)
-  data.push([split[1], split[2].to_i])
+  instructions.push([split[1], split[2].to_i])
 end
 
 def move_by_angle(point, angle, distance)
@@ -24,7 +22,7 @@ end
 def part1(data)
   ship = [0, 0]
   ang = 90
-  for instr in data
+  data.each do |instr|
     case instr.first
     when 'F'
       ship = move_by_angle(ship, ang, instr.last)
@@ -60,7 +58,7 @@ end
 def part2(data)
   ship = [0, 0]
   waypoint = [1, 10]
-  for instr in data
+  data.each do |instr|
     case instr.first
     when 'F'
       ship[0] += waypoint[0] * instr.last
@@ -83,6 +81,6 @@ def part2(data)
   ship[0].abs + ship[1].abs
 end
 
-print "Part 1:  #{part1(data)}\n"
+print "Part 1:  #{part1(instructions)}\n"
 
-print "Part 2:  #{part2(data)}\n"
+print "Part 2:  #{part2(instructions)}\n"
