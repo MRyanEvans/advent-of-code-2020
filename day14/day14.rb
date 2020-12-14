@@ -1,10 +1,9 @@
 #!/usr/bin/env ruby
 
 input = []
-mask = ''
-f = File.open("input.txt", "r")
+f = File.open('input.txt', 'r')
 f.each_line do |line|
-  mask_match = line.strip.split(/mask\s=\s((0|1|X)+)/)
+  mask_match = line.strip.split(/mask\s=\s(([01X])+)/)
   mem_match = line.strip.split(/mem\[([0-9]+)\]\s=\s([0-9]+)/)
   input << [:mask, mask_match[1]] if mask_match.count > 1
   input << [:mem, mem_match[1].to_i, mem_match[2].to_i] if mem_match.count > 1
@@ -26,28 +25,23 @@ def part1(values)
   addresses.values.inject(:+)
 end
 
-def mask (address)
-  orig = address.clone
+def generate_addresses(masked_address)
   indexes = []
-  masks = []
-  address.clone.chars.each_with_index do |c, index|
+  addresses = []
+  masked_address.clone.chars.each_with_index do |c, index|
     indexes << index if c == 'X'
   end
   value_combs = %w[0 1].cycle(indexes.size).to_a.combination(indexes.size).uniq
   position_combs = indexes.combination(indexes.size).cycle(value_combs.size).to_a
 
   position_combs.zip(value_combs).each do |p, v|
-    tempmask = orig.clone
-    (0..tempmask.length - 1).each do |i|
-      if p.include? i
-        pi = p.index(i)
-        vn = v[pi]
-        tempmask[i] = vn
-      end
+    temp_address = masked_address.clone
+    (0..temp_address.length - 1).each do |i|
+      temp_address[i] = v[p.index(i)] if p.include? i
     end
-    masks << tempmask.clone
+    addresses << temp_address.to_i(2)
   end
-  masks
+  addresses
 end
 
 def part2(values)
@@ -59,15 +53,14 @@ def part2(values)
       next
     end
 
-    new_mask = v[1].to_s(2).rjust(mask.length, "0")
-                   .chars
-                   .zip(mask.chars)
-                   .map { |address_char, mask_char| mask_char == "0" ? address_char : mask_char }
-                   .join
-    masks = mask(new_mask)
-    masks.each do |m|
-      addresses[m.to_i(2).clone] = v[2]
-    end
+    mask_overlayed_on_address = v[1].to_s(2)
+                                    .rjust(mask.length, '0')
+                                    .chars
+                                    .zip(mask.chars)
+                                    .map { |address_char, mask_char| mask_char == '0' ? address_char : mask_char }
+                                    .join
+    all_addresses = generate_addresses(mask_overlayed_on_address)
+    all_addresses.each { |a| addresses[a] = v[2] }
   end
   addresses.values.inject(:+)
 end
